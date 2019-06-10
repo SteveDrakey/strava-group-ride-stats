@@ -72,11 +72,13 @@ export class AthletesService {
 
         let headers = this.defaultHeaders;
 
+        console.log('token', this.configuration.accessToken);
         // authentication (strava_oauth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
                 : this.configuration.accessToken;
+            console.log('token', accessToken);
             headers = headers.set('Authorization', 'Bearer ' + accessToken);
         }
 

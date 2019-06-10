@@ -1,3 +1,7 @@
-<p>
-  connect-to-strava works!
-</p>
+<div *ngIf='!authentication.currentAthlete'>
+<h1>Please connect to strava</h1>
+<button mat-button (click)='connectToStrava()'>Connect Me</button>
+</div>
+<div *ngIf='authentication.currentAthlete'>
+<h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1> 
+</div>

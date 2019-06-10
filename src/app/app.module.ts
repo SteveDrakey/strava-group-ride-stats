@@ -24,6 +24,7 @@ import { UploadsService } from './api/uploads.service';
 
 import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.component';
 import { LastRideDetailsComponent } from './last-ride-details/last-ride-details.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { LastRideDetailsComponent } from './last-ride-details/last-ride-details.
     LastRideDetailsComponent,
   ],
   imports: [
+    HttpClientModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
