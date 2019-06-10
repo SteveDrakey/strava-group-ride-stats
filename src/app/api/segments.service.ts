@@ -379,7 +379,7 @@ export class SegmentsService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): void; };
+        let formParams: { append(param: string, value: any): void | HttpParams; };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
