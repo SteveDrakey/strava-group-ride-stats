@@ -10,7 +10,8 @@ export class GroupRideLeadersService {
 
   constructor(protected activitiesService: ActivitiesService, protected segmentsService: SegmentsService) { }
 
-  LeadBoard(activityId: number): Observable<Leader[]> {
+  LeadBoard(activityId?: number): Observable<Leader[]> {
+
 
     const getRoundedDate = (minutes: number, d= new Date()): Date => {
 
@@ -23,6 +24,13 @@ export class GroupRideLeadersService {
     return Observable.create(async (observer: { next: (arg0: Leader[]) => void; }) => {
 
       const rval: Leader[] = new Array();
+      if (!activityId) {
+        const activitys = await this.activitiesService.getLoggedInAthleteActivities().toPromise();
+        console.log('activitys', activitys[0].id);
+        activityId = activitys[0].id;
+      }
+
+
       const activity = await this.activitiesService.getActivityById(activityId).toPromise();
 
       for await (const segment of activity.segment_efforts) {

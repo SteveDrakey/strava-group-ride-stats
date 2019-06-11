@@ -8,6 +8,7 @@ import { AuthenticationService } from '../authentication.service';
 import { GroupRideLeadersService, Leader } from '../group-ride-leaders.service';
 import { Observable, merge } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {APP_BASE_HREF} from '@angular/common';
 
 @Component({
   selector: 'app-connect-to-strava',
@@ -32,7 +33,7 @@ export class ConnectToStravaComponent implements OnInit {
   connectToStrava() {
     const params = {
       client_id: '15088',
-      redirect_uri: 'http://localhost:4200/home',
+      redirect_uri: `${location.origin}${location.pathname}`,
       response_type: 'code',
       approval_prompt: 'auto',
       scope: 'activity:read'
@@ -62,7 +63,7 @@ export class ConnectToStravaComponent implements OnInit {
 
     // this.leadboard = await this.groupRideLeadersService.LeadBoard(2426715456).toPromise<Leader[]>();
 
-    this.groupRideLeadersService.LeadBoard(2440079502).subscribe((data) => {
+    this.groupRideLeadersService.LeadBoard().subscribe((data) => {
       this.leadboard = data;
     }
     );

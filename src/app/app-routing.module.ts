@@ -4,6 +4,7 @@ import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.
 
 const routes: Routes = [
   { path: 'home', component: ConnectToStravaComponent },
+  { path: '', component: ConnectToStravaComponent }
 ];
 
 @NgModule({
