@@ -5,29 +5,69 @@
 <div *ngIf='authentication.currentAthlete'>
     <h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1>
 </div>
-<table mat-table [dataSource]="leadboard" class="mat-elevation-z8 m2">
+
+<div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="0.5%" fxLayoutAlign="left">
+
+<mat-card>
+    <mat-card-title>Segments</mat-card-title>
+<table color="primary" mat-table [dataSource]="leadboard" class="mat-elevation-z8 m2">
     <ng-container matColumnDef="grade">
-                <th mat-header-cell *matHeaderCellDef> Grade </th>
-                <td mat-cell *matCellDef="let element"> {{element.grade}} </td>
+        <th mat-header-cell *matHeaderCellDef> Grade </th>
+        <td mat-cell *matCellDef="let element"> {{element.grade}} </td>
     </ng-container>
-        
+
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let element"> {{element.name}} </td>
     </ng-container>
     <ng-container matColumnDef="first">
-            <th mat-header-cell *matHeaderCellDef> 1st </th>
-            <td mat-cell *matCellDef="let element"> {{element.first}} </td>
+        <th mat-header-cell *matHeaderCellDef> 1st </th>
+        <td mat-cell *matCellDef="let element"> {{element.first}} </td>
     </ng-container>
     <ng-container matColumnDef="second">
-            <th mat-header-cell *matHeaderCellDef> 2nd </th>
-            <td mat-cell *matCellDef="let element"> {{element.second}} </td>
+        <th mat-header-cell *matHeaderCellDef> 2nd </th>
+        <td mat-cell *matCellDef="let element"> {{element.second}} </td>
     </ng-container>
     <ng-container matColumnDef="third">
-            <th mat-header-cell *matHeaderCellDef> 3rd </th>
-            <td mat-cell *matCellDef="let element"> {{element.third}} </td>
+        <th mat-header-cell *matHeaderCellDef> 3rd </th>
+        <td mat-cell *matCellDef="let element"> {{element.third}} </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+</mat-card>
+<mat-card>
+        <mat-card-title>Uphill</mat-card-title>
+<table color="primary" mat-table [dataSource]="upHillLeaders" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="points">
+        <th mat-header-cell *matHeaderCellDef> Points </th>
+        <td mat-cell *matCellDef="let element"> {{element.points}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedLeaderColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedLeaderColumns;"></tr>
+</table>
+</mat-card>
+<mat-card>
+        <mat-card-title>Downhill</mat-card-title>
+<table color="primary" mat-table [dataSource]="downHillLeaders" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="points">
+        <th mat-header-cell *matHeaderCellDef> Points </th>
+        <td mat-cell *matCellDef="let element"> {{element.points}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedLeaderColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedLeaderColumns;"></tr>
+</table>
+</mat-card>
+
+</div>

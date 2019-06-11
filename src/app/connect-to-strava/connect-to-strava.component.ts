@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AthletesService } from '../api/athletes.service';
 import { DetailedAthlete } from '../model/models';
 import { AuthenticationService } from '../authentication.service';
-import { GroupRideLeadersService, Leader } from '../group-ride-leaders.service';
+import { GroupRideLeadersService, Leader, LeadTableEntry } from '../group-ride-leaders.service';
 import { Observable, merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {APP_BASE_HREF} from '@angular/common';
@@ -18,7 +18,12 @@ import {APP_BASE_HREF} from '@angular/common';
 export class ConnectToStravaComponent implements OnInit {
   code: string;
   leadboard: Leader[] = []; // = [ {name: 'test' } ];
+
   displayedColumns: string[] = ['grade', 'name', 'first', 'second', 'third'];
+  displayedLeaderColumns: string[] = ['name', 'points'];
+
+  upHillLeaders: LeadTableEntry[] = [];
+  downHillLeaders: LeadTableEntry[] = [];
 
   constructor(
     private groupRideLeadersService: GroupRideLeadersService,
@@ -65,6 +70,8 @@ export class ConnectToStravaComponent implements OnInit {
 
     this.groupRideLeadersService.LeadBoard().subscribe((data) => {
       this.leadboard = data;
+      this.upHillLeaders = this.groupRideLeadersService.UpHillLeaders(data);
+      this.downHillLeaders = this.groupRideLeadersService.DownHillLeaders(data);
     }
     );
 

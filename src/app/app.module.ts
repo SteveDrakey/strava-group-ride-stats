@@ -20,7 +20,7 @@ import { SegmentEffortsService } from './api/segmentEfforts.service';
 import { SegmentsService } from './api/segments.service';
 import { StreamsService } from './api/streams.service';
 import { UploadsService } from './api/uploads.service';
-
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.component';
 import { LastRideDetailsComponent } from './last-ride-details/last-ride-details.component';
@@ -44,6 +44,7 @@ export function ConfigurationFactory(): Configuration {
     LastRideDetailsComponent,
   ],
   imports: [
+    FlexLayoutModule,
     HttpClientModule,
     BrowserModule,
     AppRoutingModule,

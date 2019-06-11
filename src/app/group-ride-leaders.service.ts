@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivitiesService } from './api/activities.service';
 import { SegmentsService } from './api/segments.service';
 import { Observable } from 'rxjs';
+import { stringify } from '@angular/core/src/render3/util';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +47,7 @@ export class GroupRideLeadersService {
 
         const top3 = leaders.entries
                     .filter(f => getRoundedDate(10, new Date( f.start_date)).valueOf() === startDate.valueOf() )
-                    .sort(s => s.elapsed_time)
+                    .sort( (s1, s2) => s1.elapsed_time - s2.elapsed_time)
                     .slice(0, 3)
                     .map( m => m.athlete_name);
 
@@ -56,6 +57,44 @@ export class GroupRideLeadersService {
       observer.next(rval);
     });
   }
+
+  UpHillLeaders( leaders: Leader[] ): LeadTableEntry[] {
+
+    const rval: LeadTableEntry[] = [];
+
+    leaders = leaders.filter( (f) => f.grade > 0);
+    return this.Leaders(leaders);
+  }
+
+  Leaders(leaders: Leader[]): LeadTableEntry[] {
+    const rval: LeadTableEntry[] = [];
+    for (const leader of leaders) {
+      if (rval.filter( f => f.name === leader.first).length === 0) {
+        rval.push( { name: leader.first, points: 0 } );
+      }
+      if (rval.filter( f => f.name === leader.second).length === 0) {
+        rval.push( { name: leader.second, points: 0 } );
+      }
+
+      if (rval.filter( f => f.name === leader.third).length === 0) {
+        rval.push( { name: leader.third, points: 0 } );
+      }
+    }
+
+    for (const leader of leaders) {
+      rval.filter( f => f.name === leader.first)[0].points += 5;
+      rval.filter( f => f.name === leader.second)[0].points += 2;
+      rval.filter( f => f.name === leader.third)[0].points += 1;
+    }
+    console.log('sort one', rval.filter( (f) => f.name).sort( (n1, n2) => n2.points - n1.points));
+
+    return rval.filter( (f) => f.name).sort( (n1, n2) => n2.points - n1.points);
+  }
+
+  DownHillLeaders( leaders: Leader[] ): LeadTableEntry[] {
+    leaders = leaders.filter( (f) => f.grade < 0);
+    return this.Leaders(leaders);
+  }
 }
 
 export interface Leader {
@@ -64,4 +103,9 @@ export interface Leader {
   second?: string;
   third?: string;
   grade?: number;
+}
+
+export interface LeadTableEntry {
+  name: string;
+  points: number;
 }
