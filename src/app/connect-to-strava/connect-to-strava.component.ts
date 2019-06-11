@@ -8,7 +8,7 @@ import { AuthenticationService } from '../authentication.service';
 import { GroupRideLeadersService, Leader, LeadTableEntry } from '../group-ride-leaders.service';
 import { Observable, merge } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {APP_BASE_HREF} from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
 
 @Component({
   selector: 'app-connect-to-strava',
@@ -60,20 +60,20 @@ export class ConnectToStravaComponent implements OnInit {
 
     if (this.code) {
       await this.authentication.authorizeToken(this.code);
-      this.location.go('/home');
-      return;
+    } else {
+      // Can we just refresh the token?
+      await this.authentication.login();
     }
-    // Can we just refresh the token?
-    await this.authentication.login();
 
     // this.leadboard = await this.groupRideLeadersService.LeadBoard(2426715456).toPromise<Leader[]>();
-
-    this.groupRideLeadersService.LeadBoard().subscribe((data) => {
-      this.leadboard = data;
-      this.upHillLeaders = this.groupRideLeadersService.UpHillLeaders(data);
-      this.downHillLeaders = this.groupRideLeadersService.DownHillLeaders(data);
+    if (AuthenticationService.accesstoken) {
+      console.log('doing it');
+      this.groupRideLeadersService.LeadBoard().subscribe((data) => {
+        this.leadboard = data;
+        this.upHillLeaders = this.groupRideLeadersService.UpHillLeaders(data);
+        this.downHillLeaders = this.groupRideLeadersService.DownHillLeaders(data);
+      }
+      );
     }
-    );
-
   }
 }

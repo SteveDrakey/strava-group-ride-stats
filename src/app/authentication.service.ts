@@ -30,6 +30,7 @@ export class AuthenticationService {
 
   }
   async refreshExpiredToken(refreshToken: string) {
+    console.log('refreshExpiredToken');
     const options = {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
     };
@@ -53,7 +54,7 @@ export class AuthenticationService {
   }
 
   async authorizeToken(code: string) {
-
+    console.log('authorizeToken');
     const options = {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
     };
@@ -70,6 +71,7 @@ export class AuthenticationService {
     this.refreshToken = reply.refresh_token;
     AuthenticationService.accesstoken = reply.access_token;
     localStorage.setItem('refresh_token', this.refreshToken);
+    localStorage.setItem('accesstoken', AuthenticationService.accesstoken);
 
     this.athletesService.configuration.accessToken = reply.access_token;
     this.currentAthlete  = await this.athletesService.getLoggedInAthlete().toPromise();
