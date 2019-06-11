@@ -30,7 +30,7 @@ export interface SummarySegment {
     /**
      * The segment's average grade, in percents
      */
-    averageGrade?: number;
+    average_grade?: number;
     /**
      * The segments's maximum grade, in percents
      */

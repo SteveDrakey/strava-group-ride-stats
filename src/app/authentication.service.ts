@@ -7,8 +7,9 @@ import { ThrowStmt } from '@angular/compiler';
   providedIn: 'root'
 })
 export class AuthenticationService {
+  static accesstoken: string;
+
   refreshToken: string;
-  public accesstoken: string;
   public currentAthlete: any;
 
   constructor(
@@ -43,8 +44,8 @@ export class AuthenticationService {
     const reply = await this.httpClient.post('https://www.strava.com/oauth/token', data.toString(), options).toPromise<any>();
 
     this.refreshToken = reply.refresh_token;
-    this.accesstoken = reply.access_token;
-    localStorage.setItem('refresh_token', this.refreshToken);
+    AuthenticationService.accesstoken = reply.access_token;
+    localStorage.setItem('accesstoken', AuthenticationService.accesstoken);
 
     this.athletesService.configuration.accessToken = reply.access_token;
     this.currentAthlete  = await this.athletesService.getLoggedInAthlete().toPromise();
@@ -67,7 +68,7 @@ export class AuthenticationService {
     const reply = await this.httpClient.post('https://www.strava.com/api/v3/oauth/token', data.toString(), options).toPromise<any>();
 
     this.refreshToken = reply.refresh_token;
-    this.accesstoken = reply.access_token;
+    AuthenticationService.accesstoken = reply.access_token;
     localStorage.setItem('refresh_token', this.refreshToken);
 
     this.athletesService.configuration.accessToken = reply.access_token;

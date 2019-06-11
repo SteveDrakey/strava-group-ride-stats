@@ -25,6 +25,16 @@ import { UploadsService } from './api/uploads.service';
 import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.component';
 import { LastRideDetailsComponent } from './last-ride-details/last-ride-details.component';
 import { HttpClientModule } from '@angular/common/http';
+import { Configuration } from './configuration';
+import { AuthenticationService } from './authentication.service';
+
+export function ConfigurationFactory(): Configuration {
+  return new Configuration( { accessToken : () => {
+    console.log('accesstoken', AuthenticationService.accesstoken);
+    return AuthenticationService.accesstoken;
+  }
+});
+}
 
 @NgModule({
   declarations: [
@@ -49,7 +59,8 @@ import { HttpClientModule } from '@angular/common/http';
     MatMenuModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatIconModule
   ],
   providers: [
     ActivitiesService,
@@ -61,7 +72,11 @@ import { HttpClientModule } from '@angular/common/http';
     SegmentEffortsService,
     SegmentsService,
     StreamsService,
-    UploadsService],
+    UploadsService,
+    {
+      provide: Configuration, useValue: ConfigurationFactory()
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

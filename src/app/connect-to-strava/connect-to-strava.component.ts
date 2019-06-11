@@ -5,6 +5,9 @@ import { ActivatedRoute } from '@angular/router';
 import { AthletesService } from '../api/athletes.service';
 import { DetailedAthlete } from '../model/models';
 import { AuthenticationService } from '../authentication.service';
+import { GroupRideLeadersService, Leader } from '../group-ride-leaders.service';
+import { Observable, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-connect-to-strava',
@@ -13,12 +16,16 @@ import { AuthenticationService } from '../authentication.service';
 })
 export class ConnectToStravaComponent implements OnInit {
   code: string;
-  constructor(private location: Location,
-              private authentication: AuthenticationService,
-              private activatedRoute: ActivatedRoute,
-              private httpClient: HttpClient,
-              protected athletesService: AthletesService ) {
-    console.log('ConnectToStravaComponent loaded');
+  leadboard: Leader[] = []; // = [ {name: 'test' } ];
+  displayedColumns: string[] = ['grade', 'name', 'first', 'second', 'third'];
+
+  constructor(
+    private groupRideLeadersService: GroupRideLeadersService,
+    private location: Location,
+    public authentication: AuthenticationService,
+    private activatedRoute: ActivatedRoute,
+    private httpClient: HttpClient,
+    protected athletesService: AthletesService) {
 
   }
 
@@ -42,7 +49,7 @@ export class ConnectToStravaComponent implements OnInit {
 
   async ngOnInit() {
     // Snapshot is fine here, as we get sent here from strava
-    const params: any = this.activatedRoute.snapshot.queryParams ;
+    const params: any = this.activatedRoute.snapshot.queryParams;
     this.code = params.code;
 
     if (this.code) {
@@ -50,11 +57,15 @@ export class ConnectToStravaComponent implements OnInit {
       this.location.go('/home');
       return;
     }
-
     // Can we just refresh the token?
     await this.authentication.login();
 
- //   console.log('init', this.authentication.currentAthlete);
+    // this.leadboard = await this.groupRideLeadersService.LeadBoard(2426715456).toPromise<Leader[]>();
+
+    this.groupRideLeadersService.LeadBoard(2440079502).subscribe((data) => {
+      this.leadboard = data;
+    }
+    );
 
   }
 }

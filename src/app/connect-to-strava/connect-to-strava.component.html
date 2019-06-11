@@ -1,7 +1,33 @@
 <div *ngIf='!authentication.currentAthlete'>
-<h1>Please connect to strava</h1>
-<button mat-button (click)='connectToStrava()'>Connect Me</button>
+    <h1>Please connect to strava</h1>
+    <button mat-button (click)='connectToStrava()'>Connect Me</button>
 </div>
 <div *ngIf='authentication.currentAthlete'>
-<h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1> 
+    <h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1>
 </div>
+<table mat-table [dataSource]="leadboard" class="mat-elevation-z8 m2">
+    <ng-container matColumnDef="grade">
+                <th mat-header-cell *matHeaderCellDef> Grade </th>
+                <td mat-cell *matCellDef="let element"> {{element.grade}} </td>
+    </ng-container>
+        
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="first">
+            <th mat-header-cell *matHeaderCellDef> 1st </th>
+            <td mat-cell *matCellDef="let element"> {{element.first}} </td>
+    </ng-container>
+    <ng-container matColumnDef="second">
+            <th mat-header-cell *matHeaderCellDef> 2nd </th>
+            <td mat-cell *matCellDef="let element"> {{element.second}} </td>
+    </ng-container>
+    <ng-container matColumnDef="third">
+            <th mat-header-cell *matHeaderCellDef> 3rd </th>
+            <td mat-cell *matCellDef="let element"> {{element.third}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
