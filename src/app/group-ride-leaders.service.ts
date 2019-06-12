@@ -62,6 +62,7 @@ export class GroupRideLeadersService {
   }
 
   Leaders(leaders: Leader[]): LeadTableEntry[] {
+    leaders = leaders.filter( (f) => f.third ); // we need at least 3 pos'
     const rval: LeadTableEntry[] = [];
     for (const leader of leaders) {
       if (rval.filter( f => f.name === leader.first).length === 0) {

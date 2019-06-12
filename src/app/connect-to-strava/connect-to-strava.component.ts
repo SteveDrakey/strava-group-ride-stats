@@ -63,6 +63,7 @@ export class ConnectToStravaComponent implements OnInit {
 
     if (this.code) {
       await this.authentication.authorizeToken(this.code);
+      this.location.go('/');
     } else {
       // Can we just refresh the token?
       await this.authentication.login();
