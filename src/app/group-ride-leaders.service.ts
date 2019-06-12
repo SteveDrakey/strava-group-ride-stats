@@ -3,6 +3,8 @@ import { ActivitiesService } from './api/activities.service';
 import { SegmentsService } from './api/segments.service';
 import { Observable } from 'rxjs';
 import { stringify } from '@angular/core/src/render3/util';
+import { promise } from 'protractor';
+import { async } from '@angular/core/testing';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,6 @@ export class GroupRideLeadersService {
 
 
     return Observable.create(async (observer: { next: (arg0: Leader[]) => void; }) => {
-
       const rval: Leader[] = new Array();
       if (!activityId) {
         const activitys = await this.activitiesService.getLoggedInAthleteActivities().toPromise();
@@ -31,20 +32,15 @@ export class GroupRideLeadersService {
         activityId = activitys[0].id;
       }
 
-
       const activity = await this.activitiesService.getActivityById(activityId).toPromise();
 
-      for await (const segment of activity.segment_efforts) {
-
+      await Promise.all( activity.segment_efforts.map( async (segment) => {
         const startDate = getRoundedDate(10, new Date( segment.start_date));
-
         const leaders = await
           this.segmentsService.getLeaderboardBySegmentId(segment.segment.id, null, null, null, null, null, 'this_week', null, null, null)
             .toPromise();
 
         const downHill = segment.segment.average_grade < 0;
-        const direction = downHill ? 'D' : 'U';
-
         const top3 = leaders.entries
                     .filter(f => getRoundedDate(10, new Date( f.start_date)).valueOf() === startDate.valueOf() )
                     .sort( (s1, s2) => s1.elapsed_time - s2.elapsed_time)
@@ -52,8 +48,7 @@ export class GroupRideLeadersService {
                     .map( m => m.athlete_name);
 
         rval.push({ name: segment.name, first: top3[0] , second: top3[1], third: top3[2], grade: segment.segment.average_grade });
-        // rval.push({ name: segment.name});
-      }
+      }));
       observer.next(rval);
     });
   }
