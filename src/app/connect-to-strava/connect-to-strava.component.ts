@@ -44,7 +44,7 @@ export class ConnectToStravaComponent implements OnInit {
       scope: 'activity:read'
     };
 
-    const url = 'https://www.strava.com/oauth/authorize';
+    const url = 'https://www.strava.com/oauth/mobile/authorize';
 
     // tslint:disable-next-line: max-line-length
     const query = `client_id=${params.client_id}&redirect_uri=${params.redirect_uri}&response_type=${params.response_type}&approval_prompt=${params.approval_prompt}&scope=${params.scope}`;
@@ -52,7 +52,10 @@ export class ConnectToStravaComponent implements OnInit {
     console.log(`${url}?${query}`);
     window.location.href = `${url}?${query}`;
   }
-
+  Logout() {
+    localStorage.clear();
+    this.authentication.currentAthlete = null;
+  }
   async ngOnInit() {
     // Snapshot is fine here, as we get sent here from strava
     const params: any = this.activatedRoute.snapshot.queryParams;

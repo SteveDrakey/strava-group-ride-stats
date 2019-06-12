@@ -4,8 +4,7 @@
 </div>
 <div *ngIf='authentication.currentAthlete'>
     <h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1>
-
-
+    <button mat-button (click)='Logout()'>Log out</button>
 <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="0.5%" fxLayoutAlign="left">
 
 <mat-card>
