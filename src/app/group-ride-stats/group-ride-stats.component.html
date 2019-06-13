@@ -1,12 +1,5 @@
-<div *ngIf='!authentication.currentAthlete'>
-    <h1>Please connect to strava</h1>
-    <button mat-button (click)='connectToStrava()'>Connect Me</button>
-</div>
-<div *ngIf='authentication.currentAthlete'>
-    <h1>Welcome {{authentication.currentAthlete.firstname}} {{authentication.currentAthlete.lastname}}</h1>
-    <button mat-button (click)='Logout()'>Log out</button>
+<div *ngIf='groupRideLeadersService'>    
 <div fxLayout="row" fxLayout.xs="column" fxLayoutWrap fxLayoutGap="0.5%" fxLayoutAlign="left">
-
 <mat-card>
     <mat-card-title>Segments</mat-card-title>
 <table color="primary" mat-table [dataSource]="leadboard" class="mat-elevation-z8 m2">

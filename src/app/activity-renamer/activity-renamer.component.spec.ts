@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConnectToStravaComponent } from './connect-to-strava.component';
+import { ActivityRenamerComponent } from './activity-renamer.component';
 
-describe('ConnectToStravaComponent', () => {
-  let component: ConnectToStravaComponent;
-  let fixture: ComponentFixture<ConnectToStravaComponent>;
+describe('ActivityRenamerComponent', () => {
+  let component: ActivityRenamerComponent;
+  let fixture: ComponentFixture<ActivityRenamerComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConnectToStravaComponent ]
+      declarations: [ ActivityRenamerComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConnectToStravaComponent);
+    fixture = TestBed.createComponent(ActivityRenamerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

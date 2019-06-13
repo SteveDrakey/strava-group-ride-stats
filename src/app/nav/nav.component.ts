@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AuthenticationModule } from '../authentication/authentication.module';
 
 @Component({
   selector: 'app-nav',
@@ -14,7 +15,27 @@ export class NavComponent {
     .pipe(
       map(result => result.matches)
     );
+  user: string;
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(private breakpointObserver: BreakpointObserver, private authenticationModule: AuthenticationModule) {
+    this.user = 'Not Logged in';
+    authenticationModule.LoggedIn.subscribe((s) => {
+      if (s) {
+        this.user = `${s.firstname || ''} ${s.lastname || ''}`;
+      } else
+      {
+        this.user = 'Not Logged in';
+      }
+    });
+  }
+  connectToStrava() {
+    console.log('connectToStrava');
+    this.authenticationModule.connectToStrava();
+  }
+
+  Logout() {
+    this.authenticationModule.Logout();
+  }
+
 
 }

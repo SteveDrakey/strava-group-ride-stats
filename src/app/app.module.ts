@@ -22,16 +22,17 @@ import { StreamsService } from './api/streams.service';
 import { UploadsService } from './api/uploads.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
-import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.component';
 import { LastRideDetailsComponent } from './last-ride-details/last-ride-details.component';
 import { HttpClientModule } from '@angular/common/http';
 import { Configuration } from './configuration';
-import { AuthenticationService } from './authentication.service';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { GroupRideStatsComponent } from './group-ride-stats/group-ride-stats.component';
+import { ActivityRenamerComponent } from './activity-renamer/activity-renamer.component';
 
 export function ConfigurationFactory(): Configuration {
   return new Configuration( { accessToken : () => {
-    console.log('accesstoken', AuthenticationService.accesstoken);
-    return AuthenticationService.accesstoken;
+    console.log('accesstoken', AuthenticationModule.accesstoken);
+    return AuthenticationModule.accesstoken;
   }
 });
 }
@@ -40,10 +41,12 @@ export function ConfigurationFactory(): Configuration {
   declarations: [
     AppComponent,
     NavComponent,
-    ConnectToStravaComponent,
+    GroupRideStatsComponent,
     LastRideDetailsComponent,
+    ActivityRenamerComponent,
   ],
   imports: [
+
     FlexLayoutModule,
     HttpClientModule,
     BrowserModule,
@@ -64,6 +67,7 @@ export function ConfigurationFactory(): Configuration {
     MatIconModule
   ],
   providers: [
+    AuthenticationModule,
     ActivitiesService,
     AthletesService,
     ClubsService,

@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ConnectToStravaComponent } from './connect-to-strava/connect-to-strava.component';
+import { GroupRideStatsComponent } from './group-ride-stats/group-ride-stats.component';
+import { ActivityRenamerComponent } from './activity-renamer/activity-renamer.component';
 
 const routes: Routes = [
-  { path: 'home', component: ConnectToStravaComponent },
-  { path: '', component: ConnectToStravaComponent }
+  { path: 'GroupRides', component: GroupRideStatsComponent},
+  { path: 'Renamer', component: ActivityRenamerComponent},
+  { path: '', component: GroupRideStatsComponent}
 ];
 
 @NgModule({
