@@ -22,7 +22,7 @@ export class GroupRideStatsComponent implements OnInit {
   downHillLeaders: LeadTableEntry[] = [];
 
   constructor(
-    private groupRideLeadersService: GroupRideLeadersService,
+    public groupRideLeadersService: GroupRideLeadersService,
     public authentication: AuthenticationModule,
     protected athletesService: AthletesService) {
 
@@ -30,19 +30,25 @@ export class GroupRideStatsComponent implements OnInit {
 
   async ngOnInit() {
     console.log('AuthenticationModule.accesstoken', AuthenticationModule.accesstoken);
+
+    if (AuthenticationModule.accesstoken) {
+      this.setup();
+    }
+
     this.authentication.LoggedIn.subscribe( (s) => {
-      console.log(s);
       if (s == null) {
         this.leadboard = null;
         return;
+        this.setup();
       }
-      this.groupRideLeadersService.LeadBoard().subscribe((data) => {
+    });
+  }
 
-          this.leadboard = data;
-          this.upHillLeaders = this.groupRideLeadersService.UpHillLeaders(data);
-          this.downHillLeaders = this.groupRideLeadersService.DownHillLeaders(data);
-        }
-        );
+  setup() {
+    this.groupRideLeadersService.LeadBoard().subscribe((data) => {
+      this.leadboard = data;
+      this.upHillLeaders = this.groupRideLeadersService.UpHillLeaders(data);
+      this.downHillLeaders = this.groupRideLeadersService.DownHillLeaders(data);
     });
   }
 }

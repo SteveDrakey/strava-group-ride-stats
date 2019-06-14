@@ -26,30 +26,37 @@ export class GroupRideLeadersService {
 
     return Observable.create(async (observer: { next: (arg0: Leader[]) => void; }) => {
       const rval: Leader[] = new Array();
+
       if (!activityId) {
         const activitys = await this.activitiesService.getLoggedInAthleteActivities().toPromise();
-        console.log('activitys', activitys[0].id);
         activityId = activitys[0].id;
       }
 
       const activity = await this.activitiesService.getActivityById(activityId).toPromise();
 
       await Promise.all(activity.segment_efforts.map(async (segment) => {
-        const startDate = getRoundedDate(20, new Date(segment.start_date));
-        const leaders = await
-          this.segmentsService.getLeaderboardBySegmentId(segment.segment.id, null, null, null, null, null, 'this_week', null, null, null)
-            .toPromise();
+        try {
 
-        const downHill = segment.segment.average_grade < 0;
-        const top3 = leaders.entries
-          .filter(f => getRoundedDate(20, new Date(f.start_date)).valueOf() === startDate.valueOf())
-          //.sort((s1, s2) => s1.elapsed_time - s2.elapsed_time)
-          .slice(0, 3)
-          .map(m => m.athlete_name);
+          const startDate = getRoundedDate(20, new Date(segment.start_date));
+          const leaders = await
+            this.segmentsService.getLeaderboardBySegmentId(segment.segment.id, null, null, null, null, null, 'this_week', null, null, null)
+              .toPromise();
 
-        rval.push(
-          { name: segment.name, first: top3[0], second: top3[1], third: top3[2],
-            grade: segment.segment.average_grade, startDate: segment.start_date });
+          const downHill = segment.segment.average_grade < 0;
+          const top3 = leaders.entries
+            .filter(f => getRoundedDate(20, new Date(f.start_date)).valueOf() === startDate.valueOf())
+            // .sort((s1, s2) => s1.elapsed_time - s2.elapsed_time)
+            .slice(0, 3)
+            .map(m => m.athlete_name);
+
+          rval.push(
+            {
+              name: segment.name, first: top3[0], second: top3[1], third: top3[2],
+              grade: segment.segment.average_grade, startDate: segment.start_date
+            });
+        } catch {
+          console.log(`Error reading segment ${segment.segment.id}`);
+        }
       }));
       observer.next(rval.sort((s1, s2) => new Date(s1.startDate).getTime() - new Date(s2.startDate).getTime()));
     });

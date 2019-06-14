@@ -43,7 +43,7 @@ export interface SummarySegment {
      * The segments's lowest elevation, in meters
      */
     elevationLow?: number;
-    startLatlng?: LatLng;
+    start_latlng?: LatLng;
     endLatlng?: LatLng;
     /**
      * The category of the climb [0, 5]. Higher is harder ie. 5 is Hors catégorie, 0 is uncategorized in climb_category.

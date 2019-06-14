@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NameGeneratorService } from '../name-generator.service';
 
 @Component({
   selector: 'app-activity-renamer',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ActivityRenamerComponent implements OnInit {
 
-  constructor() { }
+  constructor(protected nameGeneratorService: NameGeneratorService ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.nameGeneratorService.CoolName();
   }
 
 }

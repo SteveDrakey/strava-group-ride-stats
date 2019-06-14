@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { AthletesService } from '../api/api';
 
 
@@ -18,13 +18,13 @@ export class AuthenticationModule {
 
   public accesstoken: string;
   public scope: string;
-  LoggedIn: Subject<any>;
+  LoggedIn: BehaviorSubject<any>;
 
   constructor(
     private httpClient: HttpClient,
     private athletesService: AthletesService
   ) {
-    this.LoggedIn = new Subject<string>();
+    this.LoggedIn = new BehaviorSubject<string>(null);
   }
 
   refreshToken: string;
@@ -59,7 +59,6 @@ export class AuthenticationModule {
   async login() {
 
     this.refreshToken = localStorage.getItem('refresh_token');
-    console.log('refresh Token', this.refreshToken);
     if (this.refreshToken) {
       // lets use it
       await this.refreshExpiredToken(this.refreshToken);

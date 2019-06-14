@@ -17,13 +17,12 @@ export class NavComponent {
     );
   user: string;
 
-  constructor(private breakpointObserver: BreakpointObserver, private authenticationModule: AuthenticationModule) {
+  constructor(private breakpointObserver: BreakpointObserver, public authenticationModule: AuthenticationModule) {
     this.user = 'Not Logged in';
     authenticationModule.LoggedIn.subscribe((s) => {
       if (s) {
         this.user = `${s.firstname || ''} ${s.lastname || ''}`;
-      } else
-      {
+      } else {
         this.user = 'Not Logged in';
       }
     });
