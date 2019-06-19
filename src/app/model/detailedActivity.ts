@@ -67,7 +67,7 @@ export interface DetailedActivity {
     /**
      * The time at which the activity was started.
      */
-    startDate?: Date;
+    start_date?: Date;
     /**
      * The time at which the activity was started in the local timezone.
      */

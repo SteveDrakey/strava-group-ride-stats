@@ -28,6 +28,7 @@ import { Configuration } from './configuration';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { GroupRideStatsComponent } from './group-ride-stats/group-ride-stats.component';
 import { ActivityRenamerComponent } from './activity-renamer/activity-renamer.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 export function ConfigurationFactory(): Configuration {
   return new Configuration( { accessToken : () => {
@@ -64,7 +65,8 @@ export function ConfigurationFactory(): Configuration {
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     AuthenticationModule,

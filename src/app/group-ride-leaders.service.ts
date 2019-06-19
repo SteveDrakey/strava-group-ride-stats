@@ -5,17 +5,17 @@ import { Observable } from 'rxjs';
 import { stringify } from '@angular/core/src/render3/util';
 import { promise } from 'protractor';
 import { async } from '@angular/core/testing';
+import { DetailedActivity } from './model/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupRideLeadersService {
+  public activity: DetailedActivity;
 
   constructor(protected activitiesService: ActivitiesService, protected segmentsService: SegmentsService) { }
 
   LeadBoard(activityId?: number): Observable<Leader[]> {
-
-
     const getRoundedDate = (minutes: number, d = new Date()): Date => {
 
       const ms = 1000 * 60 * minutes; // convert minutes to ms
@@ -28,13 +28,14 @@ export class GroupRideLeadersService {
       const rval: Leader[] = new Array();
 
       if (!activityId) {
-        const activitys = await this.activitiesService.getLoggedInAthleteActivities().toPromise();
+        const activitys = (await this.activitiesService.getLoggedInAthleteActivities().toPromise()).filter( (f) => f.athlete_count > 1);
+        console.log('activitys', activitys);
         activityId = activitys[0].id;
       }
 
-      const activity = await this.activitiesService.getActivityById(activityId).toPromise();
-
-      await Promise.all(activity.segment_efforts.map(async (segment) => {
+      this.activity = await this.activitiesService.getActivityById(activityId).toPromise();
+      console.log('a', this.activity);
+      await Promise.all(this.activity.segment_efforts.map(async (segment) => {
         try {
 
           const startDate = getRoundedDate(20, new Date(segment.start_date));
