@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 259);
+/******/ 	return __webpack_require__(__webpack_require__.s = 261);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -48040,71 +48040,13 @@ exports.debug = debug // for test
 
 
 /***/ }),
-/* 259 */
+/* 259 */,
+/* 260 */,
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-var _getUserData = __webpack_require__(260);
-
-var _getUserData2 = _interopRequireDefault(_getUserData);
-
-var _oauth = __webpack_require__(68);
-
-var _oauth2 = _interopRequireDefault(_oauth);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* Function to handle intercom auth callback */
-exports.handler = (event, context, callback) => {
-  const code = event.queryStringParameters.code;
-  /* state helps mitigate CSRF attacks & Restore the previous state of your app */
-  const state = event.queryStringParameters.state;
-
-  /* Take the grant code and exchange for an accessToken */
-  _oauth2.default.authorizationCode.getToken({
-    code: code,
-    redirect_uri: _oauth.config.redirect_uri,
-    client_id: _oauth.config.clientId,
-    client_secret: _oauth.config.clientSecret
-  }).then(result => {
-    const token = _oauth2.default.accessToken.create(result);
-    console.log('..accessToken', result);
-    console.log('refresh_token token 2', result.refresh_token);
-    // Do stuff with user data
-    console.log('state', state);
-    // return results to browser
-    return callback(null, {
-      statusCode: 302,
-      headers: {
-        Location: `/?refreshToken=${result.refresh_token}`,
-        'Cache-Control': 'no-cache' // Disable caching of this response
-      }
-    });
-  }).catch(error => {
-    console.log('Access Token Error', error.message);
-    console.log(error);
-    return callback(null, {
-      statusCode: error.statusCode || 500,
-      body: JSON.stringify({
-        error: error.message
-      })
-    });
-  });
-};
-
-/***/ }),
-/* 260 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = getUserData;
 
 var _request = __webpack_require__(151);
 
@@ -48118,40 +48060,52 @@ var _oauth = __webpack_require__(68);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* Call into https://app.intercom.io/me and return user data */
-function getUserData(token) {
+/* Function to handle intercom auth callback */
+exports.handler = (event, context, callback) => {
+  const code = event.queryStringParameters.code;
+
+  console.log('code', code);
+
+  /* Take the grant code and exchange for an accessToken */
   const postData = _querystring2.default.stringify({
     client_id: _oauth.config.clientId,
     client_secret: _oauth.config.clientSecret,
-    app_id: _oauth.config.appId
+    refresh_token: code,
+    grant_type: 'refresh_token'
   });
 
-  const requestOptions = {
-    url: `${_oauth.config.profilePath}?${postData}`,
-    json: true,
-    auth: {
-      user: token.token.token,
-      pass: ''
-    },
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Accept': 'application/json'
-    }
-  };
+  console.log('postData', postData);
 
-  return requestWrapper(requestOptions, token);
-}
+  requestWrapper(null, postData).then(r => {
+    console.log('returning', r);
+    return callback(null, {
+      statusCode: 200,
+      body: r.data,
+      headers: {
+        'Cache-Control': 'no-cache' // Disable caching of this response
+      }
+    });
+  }).catch(e => {
+    console.log('e', e);
+    return callback(null, {
+      statusCode: error.statusCode || 500,
+      body: JSON.stringify({
+        error: error.message
+      })
+    });
+  });
+};
 
-/* promisify request call */
-function requestWrapper(requestOptions, token) {
+function requestWrapper(requestOptions, data) {
   return new Promise((resolve, reject) => {
-    (0, _request2.default)(requestOptions, (err, response, body) => {
+
+    _request2.default.post('https://www.strava.com/oauth/token', { form: data }, (err, response, body) => {
+      //request(requestOptions, (err, response, body) => {
       if (err) {
         return reject(err);
       }
       // return data
       return resolve({
-        token: token,
         data: body
       });
     });

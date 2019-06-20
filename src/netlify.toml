@@ -1,0 +1,7 @@
+[build]
+functions = "./functions"
+[template.environment]
+# Environment variables needed
+APP_ID = "Your Intercom App Id"
+CLIENT_ID = "Your Intercom Oauth Client Id"
+CLIENT_SECRET = "Your Intercom Oauth Secret"

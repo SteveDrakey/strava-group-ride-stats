@@ -33,7 +33,7 @@ export class AuthenticationModule {
   connectToStrava() {
     const params = {
       client_id: '15088',
-      redirect_uri: `${location.origin}${location.pathname}`,
+      redirect_uri: `${location.origin}/.netlify/functions/auth-callback/`,
       response_type: 'code',
       approval_prompt: 'auto',
       scope: 'activity:read'
@@ -68,25 +68,18 @@ export class AuthenticationModule {
   }
   async refreshExpiredToken(refreshToken: string) {
     console.log('refreshExpiredToken');
-    const options = {
-      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
-    };
 
-    const data = new URLSearchParams();
 
-    data.set('client_id', '15088');
-    data.set('client_secret', '***REMOVED***');
-    data.set('refresh_token', refreshToken);
-    data.set('grant_type', 'refresh_token');
-
-    const reply = await this.httpClient.post('https://www.strava.com/oauth/token', data.toString(), options).toPromise<any>();
+    const reply = await this.httpClient.get(`/.netlify/functions/auth-refresh?code=${refreshToken}`).toPromise<any>();
+    console.log('refreshExpiredToken', `/.netlify/functions/auth-refresh?code=${refreshToken}`);
     console.log('refreshExpiredToken', reply);
     this.refreshToken = reply.refresh_token;
     this.accesstoken = reply.access_token;
     AuthenticationModule.accesstoken = reply.access_token;
     console.log(AuthenticationModule.accesstoken );
+    this.refreshToken = refreshToken;
+    localStorage.setItem('refresh_token', refreshToken);
     localStorage.setItem('accesstoken', this.accesstoken);
-
     this.currentAthlete  = await this.athletesService.getLoggedInAthlete().toPromise();
     this.LoggedIn.next(this.currentAthlete);
 
@@ -103,7 +96,6 @@ export class AuthenticationModule {
     const data = new URLSearchParams();
 
     data.set('client_id', '15088');
-    data.set('client_secret', '***REMOVED***');
     data.set('code', code);
     data.set('grant_type', 'authorization_code');
 

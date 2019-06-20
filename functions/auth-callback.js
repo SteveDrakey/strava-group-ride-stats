@@ -16,22 +16,17 @@ exports.handler = (event, context, callback) => {
   })
     .then((result) => {
       const token = oauth2.accessToken.create(result)
-      console.log('accessToken', token)
-      return token
-    })
-    // Get more info about intercom user
-    .then(getUserData)
-    // Do stuff with user data & token
-    .then((result) => {
-      console.log('auth token', result.token)
+      console.log('..accessToken', result)
+      console.log('refresh_token token 2', result.refresh_token)
       // Do stuff with user data
-      console.log('user data', result.data)
-      // Do other custom stuff
       console.log('state', state)
       // return results to browser
       return callback(null, {
-        statusCode: 200,
-        body: JSON.stringify(result)
+        statusCode: 302,
+        headers: {
+          Location: `/?refreshToken=${result.refresh_token}`,
+          'Cache-Control': 'no-cache' // Disable caching of this response
+        },
       })
     })
     .catch((error) => {
