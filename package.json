@@ -4,11 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "buildfunctions": "netlify-lambda build functions"
+    "build": "npm-run-all --parallel build:**",
+    "build:app": "ng build",
+    "build:functions": "netlify-lambda build functions"
   },
   "private": true,
   "dependencies": {
@@ -53,6 +54,7 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
-    "typescript": "~3.2.2"
+    "typescript": "~3.2.2",
+    "npm-run-all": "^4.1.3"
   }
 }

@@ -33,7 +33,7 @@ export class AuthenticationModule {
   connectToStrava() {
     const params = {
       client_id: '15088',
-      redirect_uri: `${location.origin}/.netlify/functions/auth-callback/`,
+      redirect_uri: `${location.origin}/`,
       response_type: 'code',
       approval_prompt: 'auto',
       scope: 'activity:read'
@@ -67,16 +67,13 @@ export class AuthenticationModule {
 
   }
   async refreshExpiredToken(refreshToken: string) {
-    console.log('refreshExpiredToken');
-
-
-    const reply = await this.httpClient.get(`/.netlify/functions/auth-refresh?code=${refreshToken}`).toPromise<any>();
-    console.log('refreshExpiredToken', `/.netlify/functions/auth-refresh?code=${refreshToken}`);
+    const reply = await this.httpClient.post('/.netlify/functions/auth-refresh', refreshToken).toPromise<any>();
     console.log('refreshExpiredToken', reply);
+
     this.refreshToken = reply.refresh_token;
     this.accesstoken = reply.access_token;
     AuthenticationModule.accesstoken = reply.access_token;
-    console.log(AuthenticationModule.accesstoken );
+
     this.refreshToken = refreshToken;
     localStorage.setItem('refresh_token', refreshToken);
     localStorage.setItem('accesstoken', this.accesstoken);
@@ -87,30 +84,19 @@ export class AuthenticationModule {
   }
 
   async authorizeToken(code: string, scope: string) {
-    console.log('authorizeToken');
 
-    const options = {
-      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
-    };
+    const reply = await this.httpClient.get(`/.netlify/functions/auth-callback-get?code=${code}`).toPromise<any>();
 
-    const data = new URLSearchParams();
-
-    data.set('client_id', '15088');
-    data.set('code', code);
-    data.set('grant_type', 'authorization_code');
-
-    const reply = await this.httpClient.post('https://www.strava.com/api/v3/oauth/token', data.toString(), options).toPromise<any>();
+    console.log('authorizeToken', reply);
+    console.log('authorizeToken - refresh_token', reply.refresh_token);
 
     this.refreshToken = reply.refresh_token;
     this.accesstoken = reply.access_token;
-    this.scope = scope;
     AuthenticationModule.accesstoken = reply.access_token;
 
     localStorage.setItem('refresh_token', this.refreshToken);
     localStorage.setItem('accesstoken', this.accesstoken);
-    localStorage.setItem('scope', this.scope);
-
-    this.currentAthlete  = await this.athletesService.getLoggedInAthlete().toPromise();
-    this.LoggedIn.next(this.currentAthlete);
+    // this.currentAthlete  = await this.athletesService.getLoggedInAthlete().toPromise();
+    this.LoggedIn.next(reply.athlete);
   }
 }

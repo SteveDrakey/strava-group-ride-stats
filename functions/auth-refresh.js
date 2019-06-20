@@ -5,7 +5,9 @@ import  { config } from './utils/oauth'
 
 /* Function to handle intercom auth callback */
 exports.handler = (event, context, callback) => {
-  const code = event.queryStringParameters.code
+  console.log('event', event);
+  console.log('context', context);
+  const code = event.body;
 
   console.log('code', code)
 

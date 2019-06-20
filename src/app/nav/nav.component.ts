@@ -35,6 +35,4 @@ export class NavComponent {
   Logout() {
     this.authenticationModule.Logout();
   }
-
-
 }

@@ -4,7 +4,7 @@
   # This is the directory is publishing to netlify's CDN
   publish = "wwwroot"
   # Location of built function code
-  functions = "/src/functions"
+  functions = "functions-build"
 
 [template.environment]
  	# Environment variables needed

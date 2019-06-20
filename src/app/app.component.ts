@@ -18,10 +18,10 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     this.activatedRoute.queryParams.subscribe( async (s) => {
-      const code = s.refreshToken;
+      const code = s.code;
       const scope = s.scope;
       if (code) {
-        await this.authentication.refreshExpiredToken(code);
+        await this.authentication.authorizeToken(code, '');
         this.location.go('/');
       } else {
         // Can we just refresh the token?
