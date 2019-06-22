@@ -6,8 +6,6 @@ import  { config } from './utils/oauth'
 /* Function to handle intercom auth callback */
 exports.handler = (event, context, callback) => {
   const code = event.body;
-  console.log('code', code)
-
   /* Take the grant code and exchange for an accessToken */
   const postData = querystring.stringify({
     client_id: config.clientId,
@@ -15,11 +13,7 @@ exports.handler = (event, context, callback) => {
     refresh_token: code,
     grant_type: 'refresh_token'
   })
-  
-  console.log('postData', postData)
-
   requestWrapper(null, postData).then((r) => {
-    console.log('returning', r);
     return callback(null, {
       statusCode: 200,
       body: r.data,

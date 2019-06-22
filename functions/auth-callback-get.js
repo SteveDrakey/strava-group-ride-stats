@@ -16,7 +16,6 @@ exports.handler = (event, context, callback) => {
   })
     .then((result) => {
       const token = oauth2.accessToken.create(result)
-      console.log('..accessToken', result)
       return callback(null, {
         statusCode: 200,
         body: JSON.stringify(result),
@@ -27,7 +26,6 @@ exports.handler = (event, context, callback) => {
     })
     .catch((error) => {
       console.log('Access Token Error', error.message)
-      console.log(error)
       return callback(null, {
         statusCode: error.statusCode || 500,
         body: JSON.stringify({
