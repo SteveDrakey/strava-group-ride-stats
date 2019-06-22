@@ -5,10 +5,7 @@ import  { config } from './utils/oauth'
 
 /* Function to handle intercom auth callback */
 exports.handler = (event, context, callback) => {
-  console.log('event', event);
-  console.log('context', context);
   const code = event.body;
-
   console.log('code', code)
 
   /* Take the grant code and exchange for an accessToken */
@@ -18,7 +15,6 @@ exports.handler = (event, context, callback) => {
     refresh_token: code,
     grant_type: 'refresh_token'
   })
-  
   
   console.log('postData', postData)
 
@@ -31,8 +27,6 @@ exports.handler = (event, context, callback) => {
         'Cache-Control': 'no-cache' // Disable caching of this response
       },
     })
-
-
   }).catch(e => {
     console.log('e', e);
     return callback(null, {

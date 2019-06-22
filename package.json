@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "npm-run-all --parallel start:**",
+    "start:app": "ng serve --proxy-config proxy.conf.json",
+    "start:server": "netlify-lambda serve functions",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

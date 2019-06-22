@@ -50,3 +50,7 @@ Thumbs.db
 wwwroot/
 
 src/functions/
+
+passwords\.txt
+
+env\.bat

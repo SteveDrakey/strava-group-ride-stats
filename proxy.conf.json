@@ -1,0 +1,9 @@
+{
+   "/.netlify": {
+      "target": "http://localhost:9000",
+      "secure": false,
+      "pathRewrite": {
+         "^/\\.netlify/functions": ""
+       }
+   }
+}
