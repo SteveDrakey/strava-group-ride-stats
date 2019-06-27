@@ -29,7 +29,7 @@ export class NavComponent {
   }
   connectToStrava() {
     console.log('connectToStrava');
-    this.authenticationModule.connectToStrava();
+    this.authenticationModule.connectToStrava(null);
   }
 
   Logout() {

@@ -30,22 +30,22 @@ export class AuthenticationModule {
   refreshToken: string;
   public currentAthlete: any;
 
-  connectToStrava() {
-    const params = {
+  connectToStrava(scope) {
+        const params = {
       client_id: '15088',
       redirect_uri: `${location.origin}/`,
       response_type: 'code',
       approval_prompt: 'auto',
-      scope: 'activity:read'
+      scope: scope || 'activity:read'
     };
 
-    const url = 'https://www.strava.com/oauth/mobile/authorize';
+        const url = 'https://www.strava.com/oauth/mobile/authorize';
 
     // tslint:disable-next-line: max-line-length
-    const query = `client_id=${params.client_id}&redirect_uri=${params.redirect_uri}&response_type=${params.response_type}&approval_prompt=${params.approval_prompt}&scope=${params.scope}`;
+        const query = `client_id=${params.client_id}&redirect_uri=${params.redirect_uri}&response_type=${params.response_type}&approval_prompt=${params.approval_prompt}&scope=${params.scope}`;
 
-    console.log(`${url}?${query}`);
-    window.location.href = `${url}?${query}`;
+        console.log(`${url}?${query}`);
+        window.location.href = `${url}?${query}`;
   }
 
   Logout() {
