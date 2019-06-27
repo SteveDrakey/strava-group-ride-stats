@@ -6,6 +6,8 @@ import { stringify } from '@angular/core/src/render3/util';
 import { promise } from 'protractor';
 import { async } from '@angular/core/testing';
 import { DetailedActivity } from './model/models';
+import * as moment from 'moment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -40,13 +42,12 @@ export class GroupRideLeadersService {
 
           const startDate = getRoundedDate(20, new Date(segment.start_date));
           const leaders = await
-            this.segmentsService.getLeaderboardBySegmentId(segment.segment.id, null, null, null, null, null, 'this_week', null, null, null)
+            this.segmentsService.getLeaderboardBySegmentId(segment.segment.id, null, null, null, true, null, 'this_week', null, null, null)
               .toPromise();
 
           const downHill = segment.segment.average_grade < 0;
           const top3 = leaders.entries
-            .filter(f => getRoundedDate(20, new Date(f.start_date)).valueOf() === startDate.valueOf())
-            // .sort((s1, s2) => s1.elapsed_time - s2.elapsed_time)
+            .filter(f => moment(f.start_date).isSame(segment.start_date, 'day'))
             .slice(0, 3)
             .map(m => m.athlete_name);
 

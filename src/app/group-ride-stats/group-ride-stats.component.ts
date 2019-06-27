@@ -29,7 +29,6 @@ export class GroupRideStatsComponent implements OnInit {
     public groupRideLeadersService: GroupRideLeadersService,
     public authentication: AuthenticationModule,
     protected athletesService: AthletesService) {
-
   }
 
   async ngOnInit() {
