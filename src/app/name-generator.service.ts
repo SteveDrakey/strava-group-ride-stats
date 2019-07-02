@@ -21,12 +21,14 @@ export class NameGeneratorService {
     const activity = await this.activitiesService.getActivityById(activityId).toPromise();
 
 
-    const segmentNames = activity.segment_efforts.filter(f => f.segment.city).map(m => m.segment.city);
+    let segmentNames = activity.segment_efforts.filter(f => f.segment.city && f.segment.city.length > 3).map(m => m.segment.city);
 
-    for (const segment of activity.segment_efforts.filter(f => f.segment.city)) {
+    for (const segment of segmentNames) {
       // console.log('seg', `${segment.segment.name}, ${segment.segment.city} ${segment.segment.start_latlng}`);
-      console.log('seg', `${segment.segment.city}`);
+      console.log('seg', `${segment} : ${ segment.replace(/(\b(\w{1,3})\b(\W|$))/g, '')} `);
     }
+
+    segmentNames = segmentNames.map( m => m.replace(/(\b(\w{1,3})\b(\W|$))/g, '').trim());
 
     const sentence = this.joinSentence(this.byCount(segmentNames).slice(0, 3), false);
     return `Riding arround ${sentence}`;
