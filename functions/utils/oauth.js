@@ -9,6 +9,7 @@ export const config = {
   // appId: process.env.INTERCOM_APP_ID,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
+  testRefreshToken: 'a62c5fe83cdbac61f96989469d3618c2410b2e67',
   /* Intercom oauth API endpoints */
   tokenHost: intercomApi,
   authorizePath: `${intercomApi}/oauth`,

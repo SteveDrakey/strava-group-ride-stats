@@ -13,6 +13,7 @@ exports.handler = (event, context, callback) => {
     refresh_token: code,
     grant_type: 'refresh_token'
   })
+  
   requestWrapper(null, postData).then((r) => {
     return callback(null, {
       statusCode: 200,
