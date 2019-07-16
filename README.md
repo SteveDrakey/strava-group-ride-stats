@@ -10,6 +10,12 @@ Run `npm start` for a dev servers. Navigate to `http://localhost:4200/`. The app
 
 Make sure you build the functions first with `npm run build:functions`
 
+## Environment variables 
+
+Set CLIENT_SECRET=YOURSECRET
+Set CLIENT_ID=YOURCLIENTID 
+
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
