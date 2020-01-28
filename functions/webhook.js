@@ -33,7 +33,10 @@ exports.handler = (event, context, callback) => {
   requestWrapper(null, postData).then((r) => {
     var access_token = JSON.parse(r.data).access_token
 
-    makeNiceName(access_token, data.object_id);
+    // The segments are not always with us, so for a simple fix lets just sleep for 10 seconds
+    setTimeout(() => {
+      makeNiceName(access_token, data.object_id);  
+    }, 1000 * 10);
 
   }).catch(e => {
     console.log('e', e);
@@ -44,7 +47,6 @@ exports.handler = (event, context, callback) => {
       })
     })
   })
-
 
   return callback(null, {
     statusCode: 200,
@@ -70,7 +72,6 @@ function requestWrapper(requestOptions, data) {
     })
   })
 }
-
 
 function makeNiceName(token, activityId) {
   console.log('makeNiceName', activityId);
