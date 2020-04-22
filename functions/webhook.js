@@ -7,10 +7,11 @@ import request from 'request'
 /* Function to handle intercom auth callback */
 exports.handler = (event, context, callback) => {
 
+  console.log('WebHook');
   var data = JSON.parse(event.body);
   // {"aspect_type":"update"
 
-  console.log('WebHook', data.owner_id, data.aspect_type );
+  console.log('WebHook...', data.owner_id, data.aspect_type);
 
   if (data.owner_id != 6362236 || data.aspect_type != 'create' ) {
     console.log('ignored');
@@ -23,6 +24,7 @@ exports.handler = (event, context, callback) => {
 
   const challenge = event.queryStringParameters['hub.challenge'];
 
+  console.log('about to send postData');
   const postData = querystring.stringify({
     client_id: config.clientId,
     client_secret: config.clientSecret,
@@ -31,12 +33,17 @@ exports.handler = (event, context, callback) => {
   });
 
   requestWrapper(null, postData).then((r) => {
+
+    console.log('post data callback');
+
     var access_token = JSON.parse(r.data).access_token
+
+    console.log('we have a token');
 
     // The segments are not always with us, so for a simple fix lets just sleep for 10 seconds
     setTimeout(() => {
-      makeNiceName(access_token, data.object_id);  
-    }, 1000 * 10);
+      makeNiceName(access_token, data.object_id);
+    }, 1000 * 5);
 
   }).catch(e => {
     console.log('e', e);
@@ -77,7 +84,7 @@ function makeNiceName(token, activityId) {
   console.log('makeNiceName', activityId);
   var strava = require('strava-v3');
   strava.activities.get(
-    { 'access_token': token,id: activityId }, 
+    { 'access_token': token, id: activityId },
     function (err, activity, limits) {
       let segmentNames = activity.segment_efforts.filter(f => f.segment.city && f.segment.city.length > 3).map(m => m.segment.city);
       for (const segment of segmentNames) {
@@ -89,10 +96,10 @@ function makeNiceName(token, activityId) {
 
       //const update = { name: 'Riding around ' + coolName };
 
-      strava.activities.update({ 'access_token': token,id: activityId, name: 'Riding around ' + sentence} ,
-      function (err, done, limits) {
-        console.log('updated ride name');
-      }
+      strava.activities.update({ 'access_token': token, id: activityId, name: 'Riding around ' + sentence },
+        function (err, done, limits) {
+          console.log('updated ride name', err);
+        }
       );
       console.log('sentence', sentence);
     });
