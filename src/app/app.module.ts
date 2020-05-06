@@ -7,7 +7,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@angular/cdk/layout';
 
 // tslint:disable-next-line: max-line-length
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatGridListModule, MatCardModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatSortModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavComponent } from './nav/nav.component';
 
 import { ActivitiesService } from './api/activities.service';
@@ -29,6 +39,9 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { GroupRideStatsComponent } from './group-ride-stats/group-ride-stats.component';
 import { ActivityRenamerComponent } from './activity-renamer/activity-renamer.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { FreeSearchComponent } from './free-search/free-search.component';
+import {MatInputModule} from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
 export function ConfigurationFactory(): Configuration {
   return new Configuration( { accessToken : () => {
@@ -45,9 +58,10 @@ export function ConfigurationFactory(): Configuration {
     GroupRideStatsComponent,
     LastRideDetailsComponent,
     ActivityRenamerComponent,
+    FreeSearchComponent,
   ],
   imports: [
-
+    FormsModule,
     FlexLayoutModule,
     HttpClientModule,
     BrowserModule,
@@ -66,7 +80,9 @@ export function ConfigurationFactory(): Configuration {
     MatPaginatorModule,
     MatSortModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatInputModule
+    
   ],
   providers: [
     AuthenticationModule,

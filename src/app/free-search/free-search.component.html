@@ -1,0 +1,13 @@
+<button mat-button (click)='importRides()'>Import last few rides</button>
+
+<form class="example-form">
+    <mat-form-field class="example-full-width">
+      <mat-label>Keyword</mat-label>
+      <input (keydown.enter)='searchRides()' [ngModelOptions]="{standalone: true}" matInput placeholder="Keyword" [(ngModel)]="search">
+    </mat-form-field>
+    <button mat-button (click)='searchRides()'>Search</button>
+</form>
+
+<mat-list>
+    <mat-list-item *ngFor="let item of rides">{{item.title}}</mat-list-item>
+</mat-list>

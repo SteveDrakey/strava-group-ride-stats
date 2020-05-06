@@ -51,6 +51,7 @@ export class NameGeneratorService {
     const map = array.map((a) => array.filter((b) => a === b).length);
     return array[map.indexOf(Math.max.apply(null, map))];
   }
+  
   byCount(array) {
     const frequency = {};
 

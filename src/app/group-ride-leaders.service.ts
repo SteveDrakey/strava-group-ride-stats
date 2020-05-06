@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ActivitiesService } from './api/activities.service';
 import { SegmentsService } from './api/segments.service';
 import { Observable } from 'rxjs';
-import { stringify } from '@angular/core/src/render3/util';
 import { promise } from 'protractor';
 import { async } from '@angular/core/testing';
 import { DetailedActivity } from './model/models';
