@@ -20,8 +20,7 @@ export class FreeSearchComponent implements OnInit {
    importRides()  {
     // this.rideIndexerService.indexOb().subscribe( (s) => console.log('sub', s));
 
-
-    this.indexProgress =  this.rideIndexerService.indexOb();
+    this.indexProgress =  this.rideIndexerService.indexOb(100);
 
   // await this.rideIndexerService.index();
   }

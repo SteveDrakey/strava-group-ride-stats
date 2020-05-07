@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { DexieService } from './dexie.service';
 import { ActivitiesService, SegmentsService } from './api/api';
 import { flatten } from '@angular/compiler';
-import { Observable, observable, combineLatest, forkJoin, from, Subscriber } from 'rxjs';
+import { Observable, observable, combineLatest, forkJoin, from, Subscriber, concat } from 'rxjs';
 import { DetailedActivity, SummaryActivity } from './model/models';
 import { map, mergeMap, delay } from 'rxjs/operators';
 
@@ -39,6 +39,9 @@ export class RideIndexerService {
     for (const activitySummary of activities.slice(1, 100)) {
       try {
         console.log('Indexing', activitySummary.id);
+
+
+
         // delete first
         this.activityKeywords.where('activity').equals(activitySummary.id).delete().then((d) => console.log('Deleting main row', d));
         this.activities.where('activity').equals(activitySummary.id).delete().then((d) => console.log('Deleting words', d));
@@ -62,47 +65,85 @@ export class RideIndexerService {
     }
   }
 
-  indexOb(): Observable<string> {
+  indexOb(page?: number): Observable<string> {
+
+    page = page || 1;
     const simpleObservable = new Observable<string>((observer) => {
       const allSearch = new Array<Observable<any>>();
       observer.next('loading rides');
-      this.activitiesService.getLoggedInAthleteActivities(null, null, 1, 6).subscribe((activities) => {
-        console.log('loaded rides');
-        from(activities).pipe(mergeMap((activitySummary) => {
+      this.activitiesService.getLoggedInAthleteActivities(null, null, page, 5).subscribe((activities) => {
+        console.log('loaded rides,', activities);
+        from(activities).pipe(mergeMap(  (activitySummary) => {
           return this.loadActivity(activitySummary, observer);
-        }
-          , 2)).subscribe(
-            (s) => { }, (err) => console.error(err), () => observer.next('All rides loaded, whoop whoop (well a sample have been)')
+        }, 2)).subscribe( (s) => { },
+            (err) => console.error(err),
+            () => {
+              console.log('Page Complete', page, activities.length);
+              observer.next('Completed this page');
+              if (activities.length > 0) {
+                this.indexOb(page + 1).subscribe( (o) => observer.next( o ) );
+              }
+            }
           );
       });
     });
     return simpleObservable;
   }
 
-  private loadActivity(activitySummary: SummaryActivity, observer: Subscriber<string>): Observable<void> {
-    console.log('foreach');
-    this.activityKeywords.where('activity').equals(activitySummary.id).delete();
-    this.activities.where('activity').equals(activitySummary.id).delete();
-    const sub = this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1000), map((activity) => {
-      console.log('callback');
-      let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g);
-      for (const segment of activity.segment_efforts) {
-        if (segment.name) {
-          tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
+
+
+  private  loadActivity(activitySummary: SummaryActivity, observer: Subscriber<string>): Observable<void> {
+    console.log('foreach', activitySummary.id);
+
+    const deletes = concat<void>(
+        from(this.activityKeywords.where('activity').equals(activitySummary.id).delete()),
+        this.activities.where('activity').equals(activitySummary.id).delete().then( () => console.log('delete', activitySummary.id)) ,
+        this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1000), map((activity) => {
+          console.log('callback', activitySummary.id, activity.name);
+          let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
+
+          for (const segment of activity.segment_efforts) {
+            if (segment.name) {
+              tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
+            }
+            if (segment.segment.city) {
+              tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
+            }
+          }
+          tempArray = tempArray.filter(this.onlyUnique);
+          for (const word of tempArray) {
+            this.activityKeywords.add({ activity: activity.id, word });
+          }
+          this.activities.add({ activity: activity.id, title: activity.name });
+          console.log('Indexing', activity.name);
+          observer.next('Indexing ' + activity.name);
         }
-        if (segment.segment.city) {
-          tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
-        }
-      }
-      tempArray = tempArray.filter(this.onlyUnique);
-      for (const word of tempArray) {
-        this.activityKeywords.add({ activity: activity.id, word });
-      }
-      this.activities.add({ activity: activity.id, title: activity.name });
-      console.log('Indexing', activity.name);
-      observer.next('Indexing ' + activity.name);
-    }));
-    return sub;
+        )));
+
+    return deletes;
+    // // await this.activities.where('activity').equals(activitySummary.id).delete();
+    // return deletes.pipe( mergeMap( () => {
+    //   return this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1000), map((activity) => {
+    //     console.log('callback', activitySummary.id, activity.name);
+    //     let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
+
+    //     for (const segment of activity.segment_efforts) {
+    //       if (segment.name) {
+    //         tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
+    //       }
+    //       if (segment.segment.city) {
+    //         tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
+    //       }
+    //     }
+    //     tempArray = tempArray.filter(this.onlyUnique);
+    //     for (const word of tempArray) {
+    //       this.activityKeywords.add({ activity: activity.id, word });
+    //     }
+    //     this.activities.add({ activity: activity.id, title: activity.name });
+    //     console.log('Indexing', activity.name);
+    //     observer.next('Indexing ' + activity.name);
+    //   }));
+    // }));
   }
 
   async find(term): Promise<Activity[]> {
