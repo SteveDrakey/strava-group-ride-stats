@@ -98,7 +98,7 @@ export class RideIndexerService {
     const deletes = concat<void>(
         from(this.activityKeywords.where('activity').equals(activitySummary.id).delete()),
         this.activities.where('activity').equals(activitySummary.id).delete().then( () => console.log('delete', activitySummary.id)) ,
-        this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1000), map((activity) => {
+        this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1500), map((activity) => {
           console.log('callback', activitySummary.id, activity.name);
           let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
 

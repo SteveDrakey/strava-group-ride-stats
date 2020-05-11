@@ -9,7 +9,9 @@
 </form>
 
 <mat-list>
-    <mat-list-item *ngFor="let item of rides">{{item.title}}</mat-list-item>
+    <mat-list-item *ngFor="let item of rides">
+      <a href='https://www.strava.com/activities/{{item.activity}}'>{{item.title}} </a>
+    </mat-list-item>
 </mat-list>
 
 <div> {{indexProgress | async}} </div>
