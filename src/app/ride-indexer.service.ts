@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { DexieService } from './dexie.service';
 import { ActivitiesService, SegmentsService } from './api/api';
 import { flatten } from '@angular/compiler';
-import { Observable, observable, combineLatest, forkJoin, from, Subscriber, concat } from 'rxjs';
+import { Observable, observable, combineLatest, forkJoin, from, Subscriber, concat, BehaviorSubject } from 'rxjs';
 import { DetailedActivity, SummaryActivity } from './model/models';
 import { map, mergeMap, delay } from 'rxjs/operators';
 
@@ -26,124 +26,100 @@ export class RideIndexerService {
   activities: Dexie.Table<Activity, number>;
   activityKeywords: Dexie.Table<ActivityKeywords, number>;
 
+  OnIndexedSubject$: BehaviorSubject<string>;
+  OnIndexed$: Observable<string>;
+  OnRequestStop$ = new BehaviorSubject<boolean>(false);
+  keepRunning: boolean;
+
   constructor(
     private dexieService: DexieService,
     protected activitiesService: ActivitiesService, protected segmentsService: SegmentsService
   ) {
     this.activities = this.dexieService.table('activities');
     this.activityKeywords = this.dexieService.table('activityKeywords');
+
+    this.OnIndexedSubject$ = new BehaviorSubject<string>('');
+    this.OnIndexed$ = this.OnIndexedSubject$.asObservable();
+
   }
 
-  async index() {
-    const activities = await this.activitiesService.getLoggedInAthleteActivities(null, null, null, 100).toPromise();
+  async index(page: number): Promise<number> {
+    const activities = await this.activitiesService.getLoggedInAthleteActivities(null, null, page, 30).toPromise();
     for (const activitySummary of activities.slice(1, 100)) {
       try {
-        console.log('Indexing', activitySummary.id);
 
+        if (!this.keepRunning) { return 0; }
+        await this.delay(1000);
+        if (!this.keepRunning) { return 0; }
 
+        this.OnIndexedSubject$.next(activitySummary.name);
 
-        // delete first
-        this.activityKeywords.where('activity').equals(activitySummary.id).delete().then((d) => console.log('Deleting main row', d));
-        this.activities.where('activity').equals(activitySummary.id).delete().then((d) => console.log('Deleting words', d));
+        const kwCount = await this.activityKeywords.where('activity').equals(activitySummary.id).count();
+        const aCount = await this.activities.where('activity').equals(activitySummary.id).count();
 
-        const activity = await this.activitiesService.getActivityById(activitySummary.id).toPromise();
-        let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g);
-        for (const segment of activity.segment_efforts) {
-          if (segment.name) {
-            tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
-          }
-          if (segment.segment.city) { tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g)); }
-        }
-        tempArray = tempArray.filter(this.onlyUnique);
-        for (const word of tempArray) {
-          this.activityKeywords.add({ activity: activity.id, word });
-        }
-        this.activities.add({ activity: activity.id, title: activity.name });
+        console.log('Counts', activitySummary.name, kwCount, aCount);
+
+        if (kwCount > 0 && aCount > 0) { continue; }
+
+        await this.activityKeywords.where('activity').equals(activitySummary.id).delete();
+        await this.activities.where('activity').equals(activitySummary.id).delete();
+
+        await this.loadActivity(activitySummary);
+
       } catch     {
         console.error('Error processing', activitySummary.id);
       }
+    }
+    return activities.length;
+  }
+
+  async indexAll(page: number) {
+    while (await this.index(page) > 0 && this.keepRunning) {
+      page++;
     }
   }
 
   indexOb(page?: number): Observable<string> {
 
     page = page || 1;
+
+    this.keepRunning = true;
+
     const simpleObservable = new Observable<string>((observer) => {
-      const allSearch = new Array<Observable<any>>();
-      observer.next('loading rides');
-      this.activitiesService.getLoggedInAthleteActivities(null, null, page, 5).subscribe((activities) => {
-        console.log('loaded rides,', activities);
-        from(activities).pipe(mergeMap(  (activitySummary) => {
-          return this.loadActivity(activitySummary, observer);
-        }, 2)).subscribe( (s) => { },
-            (err) => console.error(err),
-            () => {
-              console.log('Page Complete', page, activities.length);
-              observer.next('Completed this page');
-              if (activities.length > 0) {
-                this.indexOb(page + 1).subscribe( (o) => observer.next( o ) );
-              }
-            }
-          );
-      });
+      this.indexAll(page).then(() => observer.next('Done')).finally(() => observer.complete());
     });
     return simpleObservable;
   }
 
 
+  public stop() {
+    this.keepRunning = false;
+  }
 
-  private  loadActivity(activitySummary: SummaryActivity, observer: Subscriber<string>): Observable<void> {
+
+  private async  loadActivity(activitySummary: SummaryActivity) {
     console.log('foreach', activitySummary.id);
 
-    const deletes = concat<void>(
-        from(this.activityKeywords.where('activity').equals(activitySummary.id).delete()),
-        this.activities.where('activity').equals(activitySummary.id).delete().then( () => console.log('delete', activitySummary.id)) ,
-        this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1500), map((activity) => {
-          console.log('callback', activitySummary.id, activity.name);
-          let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
+    if (!this.keepRunning) { return 0; }
+    const activity = await this.activitiesService.getActivityById(activitySummary.id).toPromise();
+    if (!this.keepRunning) { return 0; }
+    console.log('callback', activitySummary.id, activity.name);
+    let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
 
-          for (const segment of activity.segment_efforts) {
-            if (segment.name) {
-              tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
-            }
-            if (segment.segment.city) {
-              tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
-            }
-          }
-          tempArray = tempArray.filter(this.onlyUnique);
-          for (const word of tempArray) {
-            this.activityKeywords.add({ activity: activity.id, word });
-          }
-          this.activities.add({ activity: activity.id, title: activity.name });
-          console.log('Indexing', activity.name);
-          observer.next('Indexing ' + activity.name);
-        }
-        )));
-
-    return deletes;
-    // // await this.activities.where('activity').equals(activitySummary.id).delete();
-    // return deletes.pipe( mergeMap( () => {
-    //   return this.activitiesService.getActivityById(activitySummary.id).pipe(delay(1000), map((activity) => {
-    //     console.log('callback', activitySummary.id, activity.name);
-    //     let tempArray = activity.name.toLowerCase().match(/\b(\w+)\b/g) || new Array<string>();
-
-    //     for (const segment of activity.segment_efforts) {
-    //       if (segment.name) {
-    //         tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
-    //       }
-    //       if (segment.segment.city) {
-    //         tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
-    //       }
-    //     }
-    //     tempArray = tempArray.filter(this.onlyUnique);
-    //     for (const word of tempArray) {
-    //       this.activityKeywords.add({ activity: activity.id, word });
-    //     }
-    //     this.activities.add({ activity: activity.id, title: activity.name });
-    //     console.log('Indexing', activity.name);
-    //     observer.next('Indexing ' + activity.name);
-    //   }));
-    // }));
+    for (const segment of activity.segment_efforts) {
+      if (segment.name) {
+        tempArray = tempArray.concat(segment.name.toLowerCase().match(/\b(\w+)\b/g));
+      }
+      if (segment.segment.city) {
+        tempArray = tempArray.concat(segment.segment.city.toLowerCase().match(/\b(\w+)\b/g));
+      }
+    }
+    tempArray = tempArray.filter(this.onlyUnique);
+    for (const word of tempArray) {
+      this.activityKeywords.add({ activity: activity.id, word });
+    }
+    this.activities.add({ activity: activity.id, title: activity.name });
+    console.log('Indexing', activity.name);
   }
 
   async find(term): Promise<Activity[]> {
@@ -182,4 +158,9 @@ export class RideIndexerService {
     console.log('frequency', frequency);
     return uniques.filter((f) => frequency[f] > 0).sort((a, b) => frequency[b] - frequency[a]);
   }
+
+  async delay(ms: number) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RideIndexerService, Activity } from '../ride-indexer.service';
 import { Observable } from 'rxjs';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-free-search',
@@ -18,11 +19,15 @@ export class FreeSearchComponent implements OnInit {
   }
 
    importRides()  {
-    // this.rideIndexerService.indexOb().subscribe( (s) => console.log('sub', s));
+    this.indexProgress = this.rideIndexerService.OnIndexed$;
+    this.rideIndexerService.indexOb().subscribe( (s) => console.log('sub', s));
 
-    this.indexProgress =  this.rideIndexerService.indexOb(1);
 
   // await this.rideIndexerService.index();
+  }
+
+  async stopImportRides() {
+    this.rideIndexerService.stop();
   }
 
   async searchRides()  {
