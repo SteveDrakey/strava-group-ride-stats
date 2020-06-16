@@ -27,6 +27,7 @@
     "@angular/platform-browser": "~9.1.4",
     "@angular/platform-browser-dynamic": "~9.1.4",
     "@angular/router": "~9.1.4",
+    "@azure/search-documents": "^1.0.0-preview.4",
     "core-js": "^2.6.9",
     "dexie": "^2.0.4",
     "moment": "^2.24.0",

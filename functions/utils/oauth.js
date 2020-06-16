@@ -17,6 +17,7 @@ export const config = {
   profilePath: `${intercomApi}/me/`,
   /* redirect_uri is the callback url after successful signin */
   redirect_uri: `${siteUrl}/.netlify/functions/auth-callback`,
+  searchKey: process.env.SEARCH_KEY
 }
 
 function authInstance(credentials) {

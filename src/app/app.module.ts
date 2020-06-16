@@ -42,6 +42,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { FreeSearchComponent } from './free-search/free-search.component';
 import {MatInputModule} from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { SafeHtmlPipe } from './safe-html.pipe';
+import { MatLineModule } from '@angular/material/core';
 
 export function ConfigurationFactory(): Configuration {
   return new Configuration( { accessToken : () => {
@@ -59,6 +61,7 @@ export function ConfigurationFactory(): Configuration {
     LastRideDetailsComponent,
     ActivityRenamerComponent,
     FreeSearchComponent,
+    SafeHtmlPipe,
   ],
   imports: [
     FormsModule,
@@ -81,8 +84,9 @@ export function ConfigurationFactory(): Configuration {
     MatSortModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatInputModule
-    
+    MatInputModule,
+    MatLineModule
+
   ],
   providers: [
     AuthenticationModule,

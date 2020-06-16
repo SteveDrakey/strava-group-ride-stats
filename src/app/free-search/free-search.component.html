@@ -11,7 +11,18 @@
 
 <mat-list>
     <mat-list-item *ngFor="let item of rides">
-      <a href='https://www.strava.com/activities/{{item.activity}}'>{{item.title}} </a>
+      <h1 matLine><a  href='https://www.strava.com/activities/{{item.activity}}' [innerHTML]='item.highlights.title || item.title | safeHtml'></a> </h1>
+      <p matLine>
+        <span [innerHTML]='item.highlights.description || item.description | safeHtml'></span>
+        
+      </p> 
+      <div matLine  *ngFor="let segment of item.highlights.segments" [innerHTML]='segment | safeHtml'></div>  
+      <div matLine  *ngFor="let citY of item.highlights.cities" [innerHTML]='citY | safeHtml'></div>  
+
+      <!-- <a matLine href='https://www.strava.com/activities/{{item.activity}}' [innerHTML]='item.highlights.title || item.title | safeHtml'>
+      </a>      
+      <div mat-line [innerHTML]='item.highlights.description || item.description | safeHtml'></div>
+      <div  *ngFor="let segment of item.highlights.segments" mat-line  [innerHTML]='segment | safeHtml'></div> -->
     </mat-list-item>
 </mat-list>
 
