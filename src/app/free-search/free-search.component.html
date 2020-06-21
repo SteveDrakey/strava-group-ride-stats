@@ -1,29 +1,87 @@
-<button mat-button (click)='importRides()'>Import last few rides</button>
-<button mat-button (click)='stopImportRides()'>Stop</button>
-
-<form class="example-form">
-    <mat-form-field class="example-full-width">
+<!-- <button mat-button (click)='importRides()'>Import last few rides</button>
+<button mat-button (click)='stopImportRides()'>Stop</button> -->
+<br>
+<div fxLayout="row wrap" FxLayoutAlign="start none" fxLayoutGap="12px">
+  <div  fxFlexOffset='5' fxFlex='65'>
+    <mat-form-field  [style.fontSize.px]=22 class="example-full-width">
       <mat-label>Keyword</mat-label>
-      <input (keydown.enter)='searchRides()' [ngModelOptions]="{standalone: true}" matInput placeholder="Keyword" [(ngModel)]="search">
+      <input (keydown.enter)='searchRides()' [ngModelOptions]="{standalone: true}" matInput placeholder="Keyword"
+        [(ngModel)]="search">
     </mat-form-field>
+  </div>
+  <div fxFlex='10'>
     <button mat-button (click)='searchRides()'>Search</button>
-</form>
+    <button mat-button (click)='reset()'>Reset</button>
+  </div>
+  <div  fxFlexOffset='5' fxFlex='65'>
+    <div *ngIf='segments'>Segment filter:
+      {{segments | join:' ,'}}</div>
+  </div>
+</div>
+<br>
+<div fxLayout="row" fxLayoutGap="12px">
+  <div fxFlex=70 fxLayout="column" fxLayoutGap="12px">
+    <mat-card *ngFor="let item of rides">
+      <mat-card-title fxLayout="row">
+        <div fxFlex=90>
+          <a class='highlight' href='https://www.strava.com/activities/{{item.activity}}'
+            [innerHTML]='item?.highlights?.title || item.title | safeHtml'></a>
+        </div>
 
-<mat-list>
-    <mat-list-item *ngFor="let item of rides">
-      <h1 matLine><a  href='https://www.strava.com/activities/{{item.activity}}' [innerHTML]='item.highlights.title || item.title | safeHtml'></a> </h1>
-      <p matLine>
-        <span [innerHTML]='item.highlights.description || item.description | safeHtml'></span>
-        
-      </p> 
-      <div matLine  *ngFor="let segment of item.highlights.segments" [innerHTML]='segment | safeHtml'></div>  
-      <div matLine  *ngFor="let citY of item.highlights.cities" [innerHTML]='citY | safeHtml'></div>  
+        <div fxFlex=10 fxLayoutAlign="end">
+          <mat-card-subtitle>
+            {{item.when | date}}
+          </mat-card-subtitle>
+        </div>
+      </mat-card-title>
+      <p>
+        {{ item.map | async }}
+      </p>
+      <mat-card-subtitle *ngIf="item.description">
+        <h3 class='highlight' [innerHTML]='item?.highlights?.description || item.description | safeHtml'></h3>
+      </mat-card-subtitle>
+      <mat-card-content>
+        <div fxLayout="row" fxLayoutAlign="left center" *ngIf="item.highlights?.segments">
+          <p><span style="font-weight: bold;">Segments : </span>
+            <span *ngFor="let segment of item.highlights.segments let isLast=last"
+              [innerHtml]="segment | space | delimiter:' | ':isLast"></span>
+          </p>
+        </div>
 
-      <!-- <a matLine href='https://www.strava.com/activities/{{item.activity}}' [innerHTML]='item.highlights.title || item.title | safeHtml'>
-      </a>      
-      <div mat-line [innerHTML]='item.highlights.description || item.description | safeHtml'></div>
-      <div  *ngFor="let segment of item.highlights.segments" mat-line  [innerHTML]='segment | safeHtml'></div> -->
-    </mat-list-item>
-</mat-list>
+        <div fxLayout="row" fxLayoutAlign="left center" *ngIf="item.highlights?.cities">
+          <p><span style="font-weight: bold;">Places : </span>
+            <span *ngFor="let city of item.highlights.cities let isLast=last"
+              [innerHtml]="city | space | delimiter:' | ':isLast"></span>
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
+  </div>
+  <div *ngIf="facets$ | async as facets  " fxFlex=30 fxLayout="column" fxLayoutGap="12px">
+    <mat-card>
+      <mat-card-title>Cities</mat-card-title>
+      <mat-card-content>
+        <mat-chip-list>
+          <mat-chip *ngFor="let city of facets.cities">{{city.value}}</mat-chip>
+        </mat-chip-list>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-title>Segments</mat-card-title>
+      <mat-card-content>
+
+        <mat-selection-list #checkItems (selectionChange)='segmentChanged($event, checkItems.selectedOptions.selected)'>
+          <mat-list-option *ngFor="let segment of facets.segments" [value]='segment.value'>
+            {{segment.value}} ({{segment.count}})
+          </mat-list-option>
+        </mat-selection-list>
+
+        <!-- <mat-chip-list>
+          <mat-chip *ngFor="let segment of facets.segments" (selectionChange)='segmentChanged($event, segment )' #chip="matChip"  (click)='chip.select()'>{{segment.value}}</mat-chip>
+        </mat-chip-list> -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
 <div> {{indexProgress | async}} </div>

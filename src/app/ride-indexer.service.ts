@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { DexieService } from './dexie.service';
 import { ActivitiesService, SegmentsService } from './api/api';
 import { flatten } from '@angular/compiler';
-import { Observable, observable, combineLatest, forkJoin, from, Subscriber, concat, BehaviorSubject } from 'rxjs';
+import { Observable, observable, combineLatest, forkJoin, from, Subscriber, concat, BehaviorSubject, of } from 'rxjs';
 import { DetailedActivity, SummaryActivity } from './model/models';
 import { map, mergeMap, delay } from 'rxjs/operators';
 import {
@@ -19,7 +19,10 @@ export interface Activity {
   activity: number;
   title: string;
   description: string;
+  when: Date;
+  score?: number;
   highlights?: any;
+  map?: Observable<string>;
 }
 
 export interface ActivityKeywords {
@@ -41,6 +44,10 @@ export class RideIndexerService {
   OnRequestStop$ = new BehaviorSubject<boolean>(false);
   keepRunning: boolean;
 
+  public Facets$: Observable<any>;
+  private FacetsSubject$ = new BehaviorSubject<any>(false);
+  client: SearchClient<any>;
+
   constructor(
     private dexieService: DexieService,
     protected activitiesService: ActivitiesService, protected segmentsService: SegmentsService,
@@ -52,12 +59,33 @@ export class RideIndexerService {
     this.OnIndexedSubject$ = new BehaviorSubject<string>('');
     this.OnIndexed$ = this.OnIndexedSubject$.asObservable();
 
+    this.Facets$ = this.FacetsSubject$.asObservable();
+
+    this.client = new SearchClient<any>(
+      'https://search-strava.search.windows.net',
+      'activities',
+      new AzureKeyCredential('A77A8A928D5B9FED811EA2EA24C3992C')
+    );
   }
+
+
 
   async index(page: number): Promise<number> {
     const activities = await this.activitiesService.getLoggedInAthleteActivities(null, null, page, 30).toPromise();
     for (const activitySummary of activities.slice(1, 100)) {
       try {
+        if (!this.keepRunning) { return 0; }
+
+        // const doc =  await this.client.getDocument(activitySummary.id.toString());
+
+        try {
+          const doc =  await this.client.getDocument(activitySummary.id.toString());
+          console.log('skipping', activitySummary.id);
+          if (doc) { continue; }
+        } catch {
+
+        }
+        console.log('indexing', activitySummary.id);
 
         if (!this.keepRunning) { return 0; }
         await this.delay(1000);
@@ -79,8 +107,8 @@ export class RideIndexerService {
         //   await this.indexActivity(activitySummary);
 
 
-      } catch     {
-        console.error('Error processing', activitySummary.id);
+      } catch (e)     {
+        console.error('Error processing', activitySummary.id, e);
       }
     }
     return activities.length;
@@ -123,33 +151,59 @@ export class RideIndexerService {
 
   }
 
-  async find(term): Promise<Activity[]> {
+  async find(term, segments?: string[] ): Promise<Activity[]> {
+
+    const segmentsFilter = segments  ?
+      segments.map( (m, i) => `segments/any(s${i}: s${i} eq '${m}')`).join(' and ')
+      : null;
 
     const rval: Activity[] = [];
 
-    const client = new SearchClient<any>(
-      'https://search-strava.search.windows.net',
-      'activities',
-      new AzureKeyCredential('A77A8A928D5B9FED811EA2EA24C3992C')
-    );
+
 
     const searchResults =
-      await client.search(term.replace(/(\w+)/g, '$1~1'),
+      await this.client.search( term ? term.replace(/(\w+)/g, '$1~1')  : null ,
         {
-          select: ['id', 'title', 'description'],
+
+          top: 50,
+          filter:  segmentsFilter,
+          facets: ['segments,count:20', 'cities' ],
+
+          select: ['id', 'title', 'description', 'when'],
           highlightFields: 'title,description,segments,cities' ,
+          orderBy:  [ 'search.score() desc', 'when desc'],
           queryType: 'full',
           searchMode: 'all'
         });
-    console.log(searchResults);
-    for await (const result of searchResults.results) {
-      rval.push({ activity: result.id, title: result.title, description: result.description, highlights: result.highlights });
-      console.log(result.highlights);
-    }
 
+    console.log('searchResults', searchResults);
+    this.FacetsSubject$.next(searchResults.facets);
+
+    for await (const result of searchResults.results) {
+      rval.push(
+        { activity: result.id, title: result.title, description: result.description, highlights: result.highlights,
+          when: result.when, score: result.score, map: this.mapUrl(result.id) });
+    }
+    console.log('searchResults', searchResults);
     return rval;
 
   }
+
+  // async segmentFacets(term): Promise<any[]> {
+
+  //   console.log('find', term);
+  //   const rval: Activity[] = [];
+
+  //   const client = new SearchClient<any>(
+  //     'https://search-strava.search.windows.net',
+  //     'activities',
+  //     new AzureKeyCredential('A77A8A928D5B9FED811EA2EA24C3992C')
+  //   );
+
+  //   client.
+
+  //   return rval;
+  // }
 
   onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
@@ -168,6 +222,12 @@ export class RideIndexerService {
 
   async delay(ms: number) {
     await new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  mapUrl(id): Observable<string> {
+
+    return of('test');
+    // return this.activitiesService.getActivityById(id).pipe(map(a => 'https://d3o5xota0a1fcr.cloudfront.net/maps/' + a.map.id));
   }
 
 }

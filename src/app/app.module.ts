@@ -13,12 +13,14 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavComponent } from './nav/nav.component';
+import {MatChipsModule} from '@angular/material/chips';
 
 import { ActivitiesService } from './api/activities.service';
 import { AthletesService } from './api/athletes.service';
@@ -41,9 +43,13 @@ import { ActivityRenamerComponent } from './activity-renamer/activity-renamer.co
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { FreeSearchComponent } from './free-search/free-search.component';
 import {MatInputModule} from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SafeHtmlPipe } from './safe-html.pipe';
 import { MatLineModule } from '@angular/material/core';
+import { SpacePipe } from './space.pipe';
+import { DelimiterPipe } from './delimiter.pipe';
+import { JoinPipe } from './join.pipe';
+
 
 export function ConfigurationFactory(): Configuration {
   return new Configuration( { accessToken : () => {
@@ -62,9 +68,13 @@ export function ConfigurationFactory(): Configuration {
     ActivityRenamerComponent,
     FreeSearchComponent,
     SafeHtmlPipe,
+    SpacePipe,
+    DelimiterPipe,
+    JoinPipe,
   ],
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     FlexLayoutModule,
     HttpClientModule,
     BrowserModule,
@@ -85,8 +95,13 @@ export function ConfigurationFactory(): Configuration {
     MatIconModule,
     MatProgressSpinnerModule,
     MatInputModule,
-    MatLineModule
+    MatLineModule,
+    MatChipsModule,
+    MatAutocompleteModule
 
+  ],
+  exports: [
+    MatChipsModule
   ],
   providers: [
     AuthenticationModule,

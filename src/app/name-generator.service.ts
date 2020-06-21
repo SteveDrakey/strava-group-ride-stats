@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivitiesService, SegmentsService } from './api/api';
 import { UpdatableActivity } from './model/updatableActivity';
+import { Console } from 'console';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,8 @@ export class NameGeneratorService {
     }
 
     const activity = await this.activitiesService.getActivityById(activityId).toPromise();
+
+
 
 
     let segmentNames = activity.segment_efforts.filter(f => f.segment.city && f.segment.city.length > 3).map(m => m.segment.city);

@@ -3,6 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthenticationModule } from '../authentication/authentication.module';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-nav',
@@ -16,6 +17,10 @@ export class NavComponent {
       map(result => result.matches)
     );
   user: string;
+
+  myControl = new FormControl();
+  public search;
+  filteredOptions: Observable<string[]>;
 
   constructor(private breakpointObserver: BreakpointObserver, public authenticationModule: AuthenticationModule) {
     this.user = 'Not Logged in';

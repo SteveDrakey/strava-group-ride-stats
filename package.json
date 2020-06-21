@@ -12,7 +12,8 @@
     "build": "npm-run-all --parallel build:**",
     "build:app": "ng build",
     "build:functions": "netlify-lambda build functions",
-    "deploy": "netlify-lambda deploy"
+    "deploy": "netlify-lambda deploy",
+    "buildindex": "node buildindex.js" 
   },
   "private": true,
   "dependencies": {
@@ -33,6 +34,7 @@
     "moment": "^2.24.0",
     "rxjs": "~6.5.5",
     "rxjs-compat": "^6.5.2",
+    "shelljs": "^0.8.4",
     "simple-oauth2": "^2.2.0",
     "strava-v3": "^1.14.0",
     "tslib": "^1.10.0",

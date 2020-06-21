@@ -12,7 +12,7 @@ exports.handler = (event, context, callback) => {
   var updateName = true;
 
   // {"aspect_type":"update"
-
+  console.log(event.body);
   console.log('WebHook...', data.owner_id, data.aspect_type);
 
   if (data.owner_id != 6362236   ) {
@@ -103,6 +103,9 @@ function makeNiceName(token, activityId, updateName) {
 
       console.log('Current name', activity.name);
       console.log('Current desc', activity.description);
+      console.log('Current desc', activity.type);
+
+      if (activity.type == 'VirtualRide' ) return;
 
       if (!updateName && activity.name && activity.name.length > 3 && activity.description && activity.description.length > 3) {
         console.log('We have a name and desc, skipping');
