@@ -30,7 +30,7 @@
     "@angular/router": "~9.1.4",
     "@azure/search-documents": "^1.0.0-preview.4",
     "core-js": "^2.6.9",
-    "dexie": "^2.0.4",
+    "dexie": "^3.2.2",
     "moment": "^2.24.0",
     "rxjs": "~6.5.5",
     "rxjs-compat": "^6.5.2",
