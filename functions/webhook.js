@@ -107,6 +107,7 @@ function makeNiceName(token, activityId, updateName) {
 
       if (activity.type == 'VirtualRide' ) return;
       if (activity.type == 'Run' ) return;
+      if (activity.type !== 'Ride') return;
 
       if (!updateName && activity.name && activity.name.length > 3 && activity.description && activity.description.length > 3) {
         console.log('We have a name and desc, skipping');
